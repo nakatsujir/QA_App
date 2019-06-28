@@ -84,7 +84,7 @@ class QuestionSendActivity : AppCompatActivity(), DatabaseReference.CompletionLi
         Log.d("AAA","onActivityResult")
         if (requestCode == CHOOSER_REQUEST_CODE) {
 
-            if (requestCode != Activity.RESULT_OK) {
+            if (resultCode != Activity.RESULT_OK) {
                 if (mPictureUri != null) {
                     contentResolver.delete(mPictureUri!!, null, null)
                     mPictureUri = null
