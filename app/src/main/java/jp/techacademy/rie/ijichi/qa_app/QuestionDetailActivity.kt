@@ -1,17 +1,24 @@
 package jp.techacademy.rie.ijichi.qa_app
 
+import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_question_detail.*
+import kotlinx.android.synthetic.main.activity_question_detail.view.*
 
 class QuestionDetailActivity : AppCompatActivity() {
 
     private lateinit var mQuestion: Question
     private lateinit var mAdapter: QuestionDetailListAdapter
     private lateinit var mAnswerRef: DatabaseReference
+    private var mGenre: Int = 0
+    private val user = FirebaseAuth.getInstance().currentUser
+
+    private var favoriteFlg = false
 
     //データに追加・変化があった時に受け取るChildEventListener
     private val mEventListener = object : ChildEventListener {
@@ -58,6 +65,9 @@ class QuestionDetailActivity : AppCompatActivity() {
         val extras = intent.extras
         mQuestion = extras.get("question") as Question
 
+        // 渡ってきたジャンルの番号を保持する
+        mGenre = extras.getInt("genre")
+
         title = mQuestion.title
 
         // ListViewの準備
@@ -65,6 +75,26 @@ class QuestionDetailActivity : AppCompatActivity() {
         listView.adapter = mAdapter
         //データが変わったことを伝えてリストを再描画
         mAdapter.notifyDataSetChanged()
+
+        if (user != null) {
+            favorite_image.setImageResource(R.drawable.btn_pressed)
+
+            favorite_image.setOnClickListener {
+                favoriteFlg = !favoriteFlg
+                if (favoriteFlg) {
+                    favoriteRegister(true)
+                    favorite_image.setImageResource(R.drawable.btn)
+                } else {
+                    favoriteRegister(false)
+                    favorite_image.setImageResource(R.drawable.btn_pressed)
+                }
+            }
+        } else {
+            // ログインしていなければログイン画面に遷移させる
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
+
 
         //ログインしていなければログイン画面に遷移させ、ログインしていれば後ほど作成する回答作成画面に遷移させる
         fab.setOnClickListener { view ->
@@ -75,12 +105,12 @@ class QuestionDetailActivity : AppCompatActivity() {
                 startActivity(intent)
             } else {
                 //ログインしていれば回答作成画面に遷移させる
-                val intent = Intent(this,AnswerSendActivity::class.java)
-                intent.putExtra("question",mQuestion)
+                val intent = Intent(this, AnswerSendActivity::class.java)
+                intent.putExtra("question", mQuestion)
                 startActivity(intent)
             }
-
         }
+
         //Firebaseへのリスナーの登録。回答作成画面から戻ってきた時にその回答を表示させるために登録しておきます
         val dataBaseReference = FirebaseDatabase.getInstance().reference
         mAnswerRef =
@@ -88,6 +118,14 @@ class QuestionDetailActivity : AppCompatActivity() {
                 .child(mQuestion.questionUid).child(AnswersPATH)
         mAnswerRef.addChildEventListener(mEventListener)
 
+    }
 
+    private fun favoriteRegister(favoriteFlg: Boolean) {
+        //ファイヤーベースに登録
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        val favoriteRef = databaseReference.child(FavoritePATH).child(user!!.uid)
+        val data = HashMap<String, Boolean>()
+        data["favorite"] = favoriteFlg
+        favoriteRef.setValue(data)
     }
 }
