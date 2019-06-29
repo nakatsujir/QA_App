@@ -1,5 +1,6 @@
 package jp.techacademy.rie.ijichi.qa_app
 
+import com.google.android.gms.common.config.GservicesValue.init
 import java.io.Serializable
 
 class Question(

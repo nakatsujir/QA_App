@@ -4,7 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.util.Log
 import android.view.View
+import com.google.firebase.FirebaseError
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_question_detail.*
@@ -17,6 +20,7 @@ class QuestionDetailActivity : AppCompatActivity() {
     private lateinit var mAnswerRef: DatabaseReference
     private var mGenre: Int = 0
     private val user = FirebaseAuth.getInstance().currentUser
+    private val databaseReference = FirebaseDatabase.getInstance().reference
 
     private var favoriteFlg = false
 
@@ -77,7 +81,25 @@ class QuestionDetailActivity : AppCompatActivity() {
         mAdapter.notifyDataSetChanged()
 
         if (user != null) {
-            favorite_image.setImageResource(R.drawable.btn_pressed)
+            //データベースから取得
+            val favoriteRef = databaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
+            favoriteRef.addListenerForSingleValueEvent(object :ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val data = snapshot.value as Map<*, *>?
+                    if (data != null){
+                        val favoriteData = data["favorite"] as Boolean
+                        if (favoriteData){
+                            favorite_image.setImageResource(R.drawable.btn)
+                        }else{
+                            favorite_image.setImageResource(R.drawable.btn_pressed)
+                        }
+                    }else{
+                        favorite_image.setImageResource(R.drawable.btn_pressed)
+                    }
+                }
+                override fun onCancelled(snapshot: DatabaseError) {
+                }
+            })
 
             favorite_image.setOnClickListener {
                 favoriteFlg = !favoriteFlg
@@ -95,8 +117,6 @@ class QuestionDetailActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
-        //ログインしていなければログイン画面に遷移させ、ログインしていれば後ほど作成する回答作成画面に遷移させる
         fab.setOnClickListener { view ->
             val user = FirebaseAuth.getInstance().currentUser
             if (user == null) {
@@ -122,10 +142,11 @@ class QuestionDetailActivity : AppCompatActivity() {
 
     private fun favoriteRegister(favoriteFlg: Boolean) {
         //ファイヤーベースに登録
-        val databaseReference = FirebaseDatabase.getInstance().reference
-        val favoriteRef = databaseReference.child(FavoritePATH).child(user!!.uid)
+        val favoriteRef = databaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
         val data = HashMap<String, Boolean>()
         data["favorite"] = favoriteFlg
         favoriteRef.setValue(data)
     }
+
 }
+
