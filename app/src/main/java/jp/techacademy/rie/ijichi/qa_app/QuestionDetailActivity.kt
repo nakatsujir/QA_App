@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.google.firebase.FirebaseError
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -106,6 +107,7 @@ class QuestionDetailActivity : AppCompatActivity() {
                 if (favoriteFlg) {
                     favoriteRegister(true)
                     favorite_image.setImageResource(R.drawable.btn)
+                    Toast.makeText(this,"お気に入りに登録しました",Toast.LENGTH_SHORT).show()
                 } else {
                     favoriteRegister(false)
                     favorite_image.setImageResource(R.drawable.btn_pressed)

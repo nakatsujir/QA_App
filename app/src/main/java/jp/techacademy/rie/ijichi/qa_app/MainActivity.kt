@@ -13,6 +13,7 @@ import android.util.Base64
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ListView
+import android.widget.Toast
 import android.widget.Toolbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -27,6 +28,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var mListView: ListView
     private lateinit var mQuestionArrayList: ArrayList<Question>
     private lateinit var mAdapter: QuestionsListAdapter
+    private val user = FirebaseAuth.getInstance().currentUser
+    private lateinit var mQuestion: Question
 
     private var mGenreRef: DatabaseReference? = null
 
@@ -106,7 +109,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        mToolbar = findViewById(R.id.toolbar)
 
         setSupportActionBar(toolbar)
 
@@ -199,6 +201,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else if (id == R.id.nav_compter) {
             toolbar.title = "コンピューター"
             mGenre = 4
+        } else if (id == R.id.nav_fovorite){
+            toolbar.title = "お気に入り"
+            //ここでデータベースから取得してくる
+            val favoriteRef = mDatabaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
+            favoriteRef.addListenerForSingleValueEvent(object :ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val data = snapshot.value
+                }
+
+                override fun onCancelled(p0: DatabaseError) {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
+            })
+
+            Toast.makeText(this,"お気に入りに登録しました", Toast.LENGTH_SHORT).show()
+            mGenre = 5
         }
 
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
@@ -215,7 +233,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         mGenreRef = mDatabaseReference.child(ContentsPATH).child(mGenre.toString())
         mGenreRef!!.addChildEventListener(mEventListener)
-
 
         return true
     }
