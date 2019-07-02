@@ -82,19 +82,14 @@ class QuestionDetailActivity : AppCompatActivity() {
         mAdapter.notifyDataSetChanged()
 
         if (user != null) {
-            //データベースから取得
+            //取得
             val favoriteRef = databaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
-            favoriteRef.addListenerForSingleValueEvent(object :ValueEventListener{
+            favoriteRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val data = snapshot.value as Map<*, *>?
-                    if (data != null){
-                        val favoriteData = data["favorite"] as Boolean
-                        if (favoriteData){
-                            favorite_image.setImageResource(R.drawable.btn)
-                        }else{
-                            favorite_image.setImageResource(R.drawable.btn_pressed)
-                        }
-                    }else{
+                    if (data != null) {
+                        favorite_image.setImageResource(R.drawable.btn)
+                    } else {
                         favorite_image.setImageResource(R.drawable.btn_pressed)
                     }
                 }
@@ -105,11 +100,11 @@ class QuestionDetailActivity : AppCompatActivity() {
             favorite_image.setOnClickListener {
                 favoriteFlg = !favoriteFlg
                 if (favoriteFlg) {
-                    favoriteRegister(true)
+                    favoriteRegister()
                     favorite_image.setImageResource(R.drawable.btn)
-                    Toast.makeText(this,"お気に入りに登録しました",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "お気に入りに登録しました", Toast.LENGTH_SHORT).show()
                 } else {
-                    favoriteRegister(false)
+                    favoriteRef.removeValue()
                     favorite_image.setImageResource(R.drawable.btn_pressed)
                 }
             }
@@ -142,11 +137,11 @@ class QuestionDetailActivity : AppCompatActivity() {
 
     }
 
-    private fun favoriteRegister(favoriteFlg: Boolean) {
+    private fun favoriteRegister() {
         //ファイヤーベースに登録
         val favoriteRef = databaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
-        val data = HashMap<String, Boolean>()
-        data["favorite"] = favoriteFlg
+        val data = HashMap<String, Int>()
+        data["genre"] = mQuestion.genre
         favoriteRef.setValue(data)
     }
 

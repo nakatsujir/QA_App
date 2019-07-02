@@ -10,6 +10,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ListView
@@ -202,21 +203,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             toolbar.title = "コンピューター"
             mGenre = 4
         } else if (id == R.id.nav_fovorite){
-            toolbar.title = "お気に入り"
-            //ここでデータベースから取得してくる
-            val favoriteRef = mDatabaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
-            favoriteRef.addListenerForSingleValueEvent(object :ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val data = snapshot.value
-                }
-
-                override fun onCancelled(p0: DatabaseError) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                }
-            })
-
-            Toast.makeText(this,"お気に入りに登録しました", Toast.LENGTH_SHORT).show()
-            mGenre = 5
+            val intent = Intent(this,FavoriteActivity::class.java)
+            startActivity(intent)
         }
 
         val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
@@ -236,4 +224,5 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         return true
     }
+
 }
