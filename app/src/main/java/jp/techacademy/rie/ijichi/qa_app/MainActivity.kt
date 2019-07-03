@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var mListView: ListView
     private lateinit var mQuestionArrayList: ArrayList<Question>
     private lateinit var mAdapter: QuestionsListAdapter
-    private val user = FirebaseAuth.getInstance().currentUser
     private var mGenreRef: DatabaseReference? = null
     private var mGenre = 0
 
