@@ -41,8 +41,6 @@ class AnswerSendActivity : AppCompatActivity(),DatabaseReference.CompletionListe
         }
     }
 
-
-
     private fun onAnswerSend(v: View) {
         // キーボードが出てたら閉じる
         val im = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -75,7 +73,6 @@ class AnswerSendActivity : AppCompatActivity(),DatabaseReference.CompletionListe
 
         progressBar.visibility = View.VISIBLE
         answerRef.push().setValue(data, this)
-
 
     }
 }

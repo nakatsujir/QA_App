@@ -24,16 +24,11 @@ import kotlinx.android.synthetic.main.app_bar_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    //    private lateinit var mToolbar: Toolbar
     private lateinit var mDatabaseReference: DatabaseReference
     private lateinit var mListView: ListView
     private lateinit var mQuestionArrayList: ArrayList<Question>
     private lateinit var mAdapter: QuestionsListAdapter
-    private val user = FirebaseAuth.getInstance().currentUser
-    private lateinit var mQuestion: Question
-
     private var mGenreRef: DatabaseReference? = null
-
     private var mGenre = 0
 
     private val mEventListener = object : ChildEventListener {

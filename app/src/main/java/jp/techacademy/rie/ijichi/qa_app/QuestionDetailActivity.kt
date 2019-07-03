@@ -89,8 +89,10 @@ class QuestionDetailActivity : AppCompatActivity() {
                     val data = snapshot.value as Map<*, *>?
                     if (data != null) {
                         favorite_image.setImageResource(R.drawable.btn)
+                        favoriteFlg = true
                     } else {
                         favorite_image.setImageResource(R.drawable.btn_pressed)
+                        favoriteFlg = false
                     }
                 }
                 override fun onCancelled(snapshot: DatabaseError) {
@@ -128,7 +130,7 @@ class QuestionDetailActivity : AppCompatActivity() {
             }
         }
 
-        //Firebaseへのリスナーの登録。回答作成画面から戻ってきた時にその回答を表示させるために登録しておきます
+        //Firebaseへのリスナーの登録。回答作成画面から戻ってきた時にその回答を表示させるために登録しておく
         val dataBaseReference = FirebaseDatabase.getInstance().reference
         mAnswerRef =
             dataBaseReference.child(ContentsPATH).child(mQuestion.genre.toString())
@@ -140,10 +142,10 @@ class QuestionDetailActivity : AppCompatActivity() {
     private fun favoriteRegister() {
         //ファイヤーベースに登録
         val favoriteRef = databaseReference.child(FavoritePATH).child(user!!.uid).child(mQuestion.questionUid)
-        val data = HashMap<String, Int>()
-        data["genre"] = mQuestion.genre
+        val data = HashMap<String, String>()
+        val genre = mQuestion.genre.toString()
+        data["genre"] = genre
         favoriteRef.setValue(data)
     }
-
 }
 
