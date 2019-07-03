@@ -13,6 +13,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ListView
 import android.widget.Toast
 import android.widget.Toolbar
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var mListView: ListView
     private lateinit var mQuestionArrayList: ArrayList<Question>
     private lateinit var mAdapter: QuestionsListAdapter
+    private val user = FirebaseAuth.getInstance().currentUser
     private var mGenreRef: DatabaseReference? = null
     private var mGenre = 0
 
@@ -130,15 +132,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        // ナビゲーションドロワーの設定
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        val toggle = ActionBarDrawerToggle(this, drawer, toolbar, R.string.app_name, R.string.app_name)
-        drawer.addDrawerListener(toggle)
-        toggle.syncState()
-
-        val navigationView = findViewById<NavigationView>(R.id.nav_view)
-        navigationView.setNavigationItemSelectedListener(this)
-
         // Firebase
         mDatabaseReference = FirebaseDatabase.getInstance().reference
 
@@ -163,6 +156,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // 1:趣味を既定の選択とする
         if (mGenre == 0) {
             onNavigationItemSelected(navigationView.menu.getItem(0))
+        }
+
+        // ナビゲーションドロワーの設定
+        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+        val toggle = ActionBarDrawerToggle(this, drawer, toolbar, R.string.app_name, R.string.app_name)
+        drawer.addDrawerListener(toggle)
+        toggle.syncState()
+
+        navigationView.setNavigationItemSelectedListener(this)
+
+        val menu = navigationView.menu
+        val user = FirebaseAuth.getInstance().currentUser
+        val navFavorite = menu.findItem(R.id.nav_fovorite)
+        if (user != null) {
+            navFavorite.setVisible(true)
+        } else {
+            navFavorite.setVisible(false)
         }
     }
 
@@ -197,8 +207,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else if (id == R.id.nav_compter) {
             toolbar.title = "コンピューター"
             mGenre = 4
-        } else if (id == R.id.nav_fovorite){
-            val intent = Intent(this,FavoriteActivity::class.java)
+        } else if (id == R.id.nav_fovorite) {
+            val intent = Intent(this, FavoriteActivity::class.java)
             startActivity(intent)
         }
 
@@ -221,3 +231,4 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 }
+
